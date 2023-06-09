@@ -1,13 +1,13 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FcGoogle } from "react-icons/fc";
-import { useContext, useRef } from "react";
+import { useContext } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import { toast } from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
+import { saveUser } from "../../api/auth";
 
 const SignUp = () => {
   const navigate = useNavigate();
-  const emailRef = useRef();
   const location = useLocation();
   const from = location.state?.from?.pathname || "/";
   const {
@@ -22,11 +22,13 @@ const SignUp = () => {
     signInWithGoogle()
       .then((result) => {
         console.log(result);
+        // save user to db
+        saveUser(result.user);
         navigate(from, { replace: true });
       })
       .catch((err) => {
         setLoading(false);
-        toast(err.message);
+        toast.error(err.message);
       });
   };
 
@@ -55,8 +57,10 @@ const SignUp = () => {
 
         createUser(email, password).then((result) => {
           updateUserProfile(name, imgUrl)
-            .then((result) => {
-              console.log(result);
+            .then(() => {
+              // save user to db
+              saveUser(result.user);
+
               navigate(from, { replace: true });
             })
             .catch((err) => {

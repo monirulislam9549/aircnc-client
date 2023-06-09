@@ -5,6 +5,7 @@ import { useContext, useRef } from "react";
 import { AuthContext } from "../../providers/AuthProvider";
 import { toast } from "react-hot-toast";
 import { TbFidgetSpinner } from "react-icons/tb";
+import { saveUser } from "../../api/auth";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -35,12 +36,14 @@ const Login = () => {
   const handleGoogleSignIn = () => {
     signInWithGoogle()
       .then((result) => {
+        // save user to db
+        saveUser(result.user);
         console.log(result);
         navigate(from, { replace: true });
       })
       .catch((err) => {
         setLoading(false);
-        toast(err.message);
+        toast.error(err.message);
       });
   };
 
